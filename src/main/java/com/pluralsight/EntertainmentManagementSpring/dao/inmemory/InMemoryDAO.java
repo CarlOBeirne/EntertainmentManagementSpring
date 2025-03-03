@@ -26,12 +26,13 @@ public abstract class InMemoryDAO<T extends BaseEntity> implements BaseDao<T> {
 
     @Override
     public T create(T entity) {
-        return null;
+        entity.setId(idGenerator.getAndIncrement());
+        return datastore.put(entity.getId(), entity);
     }
 
     @Override
-    public boolean update(T entity) {
-        return datastore.computeIfPresent(entity.getId(), (key, oldValue) -> entity) != null;
+    public T update(T entity) {
+        return datastore.computeIfPresent(entity.getId(), (key, oldValue) -> entity);
     }
 
     @Override
