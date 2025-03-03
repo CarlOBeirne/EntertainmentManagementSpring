@@ -1,13 +1,14 @@
 package com.pluralsight.EntertainmentManagementSpring.dao;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface BaseDao<T> {
     
-    T findById(Long id);
+    Optional <T> findById(Long id);
     List<T> findAll();
     T create(T t);
-    T update(T t);
+    boolean update(T t);
     boolean delete(Long id);
     void resetDatastore();
 
