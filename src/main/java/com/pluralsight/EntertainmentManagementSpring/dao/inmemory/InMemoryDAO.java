@@ -2,6 +2,7 @@ package com.pluralsight.EntertainmentManagementSpring.dao.inmemory;
 
 import com.pluralsight.EntertainmentManagementSpring.dao.BaseDao;
 import com.pluralsight.EntertainmentManagementSpring.domain.BaseEntity;
+import lombok.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +16,7 @@ public abstract class InMemoryDAO<T extends BaseEntity> implements BaseDao<T> {
     protected AtomicLong idGenerator = new AtomicLong(1);
 
     @Override
-    public Optional<T> findById(Long id) {
+    public Optional<T> findById(@NonNull Long id) {
         return Optional.ofNullable(datastore.get(id));
     }
 
@@ -25,18 +26,19 @@ public abstract class InMemoryDAO<T extends BaseEntity> implements BaseDao<T> {
     }
 
     @Override
-    public T create(T entity) {
+    public T create(@NonNull T entity) {
         entity.setId(idGenerator.getAndIncrement());
-        return datastore.put(entity.getId(), entity);
+        datastore.put(entity.getId(), entity);
+        return entity;
     }
 
     @Override
-    public T update(T entity) {
+    public T update(@NonNull T entity) {
         return datastore.computeIfPresent(entity.getId(), (key, oldValue) -> entity);
     }
 
     @Override
-    public boolean delete(Long id) {
+    public boolean delete(@NonNull Long id) {
         return datastore.remove(id) != null;
     }
 
