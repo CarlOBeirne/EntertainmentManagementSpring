@@ -35,7 +35,7 @@ public class Artist extends BaseEntity {
     @JsonIgnore
     @ToString.Exclude
     @Singular
-    private List<?> tracks;
+    private List<Track> tracks;
 
 
 }
