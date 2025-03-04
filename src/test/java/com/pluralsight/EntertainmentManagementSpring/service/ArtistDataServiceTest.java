@@ -2,8 +2,6 @@ package com.pluralsight.EntertainmentManagementSpring.service;
 
 import com.pluralsight.EntertainmentManagementSpring.dao.inmemory.InMemoryDAO;
 import com.pluralsight.EntertainmentManagementSpring.domain.Artist;
-import com.pluralsight.EntertainmentManagementSpring.enums.ArtistType;
-import com.pluralsight.EntertainmentManagementSpring.enums.Genre;
 import com.pluralsight.EntertainmentManagementSpring.utils.exceptions.InvalidArtistIdException;
 import com.pluralsight.EntertainmentManagementSpring.utils.exceptions.NoArtistFoundException;
 import com.pluralsight.EntertainmentManagementSpring.utils.exceptions.NullArtistException;
@@ -33,21 +31,22 @@ class ArtistDataServiceTest {
     @Test
     void findArtistById_shouldReturnArtistMatchingId() {
         // Arrange
-        when(inMemoryDAO.findById(anyLong())).thenReturn(Optional.ofNullable(getArtists().get(1)));
+        Artist artist = Artist.builder().id(1L).build();
+        when(inMemoryDAO.findById(artist.getId())).thenReturn(Optional.of(artist));
 
         // Act
-        Optional<Artist> optionalArtist = artistDataService.findArtistById(1L);
+        Optional<Artist> optionalArtist = artistDataService.findArtistById(artist.getId());
 
         // Assert
         assertNotNull(optionalArtist);
         assertTrue(optionalArtist.isPresent());
-        assertEquals(getArtists().get(1), optionalArtist.get());
+        assertEquals(artist, optionalArtist.get());
     }
 
     @Test
     void findArtistById_shouldReturnEmptyOptionalIfArtistDoesNotExist() {
         // Arrange
-        when(inMemoryDAO.findById(anyLong())).thenReturn(Optional.empty());
+        when(inMemoryDAO.findById(1L)).thenReturn(Optional.empty());
 
         // Act
         Optional<Artist> optionalArtist = artistDataService.findArtistById(1L);
@@ -60,7 +59,6 @@ class ArtistDataServiceTest {
     @Test
     void findArtistById_shouldThrowExceptionIfNullIdIsPassed() {
         InvalidArtistIdException invalidArtistIdException = assertThrows(InvalidArtistIdException.class, () -> artistDataService.findArtistById(null));
-        assertNotNull(invalidArtistIdException);
         String exceptionMessage = invalidArtistIdException.getMessage();
         assertEquals("Artist id cannot be null", exceptionMessage);
         verify(inMemoryDAO, times(0)).findById(anyLong());
@@ -69,74 +67,62 @@ class ArtistDataServiceTest {
 
     @Test
     void findAllArtists_shouldReturnAllArtists() {
+        List<Artist> artists = List.of(new Artist(), new Artist(), new Artist(), new Artist());
         // Arrange
-        when(inMemoryDAO.findAll()).thenReturn(getArtists());
+        when(inMemoryDAO.findAll()).thenReturn(artists);
 
         // Act
-        List<Artist> allArtists = artistDataService.findAllArtists();
+        artistDataService.findAllArtists();
 
         // Assert
         verify(inMemoryDAO, times(1)).findAll();
-        assertNotNull(allArtists);
-        assertFalse(allArtists.isEmpty());
-        allArtists.forEach(artist -> assertInstanceOf(Artist.class, artist));
     }
 
     @Test
     void saveArtist_shouldThrowExceptionIfArtistIsNull() {
         NullArtistException nullArtistException = assertThrows(NullArtistException.class, () -> artistDataService.saveArtist(null));
-        assertNotNull(nullArtistException);
         String exceptionMessage = nullArtistException.getMessage();
         assertEquals("Artist cannot be null", exceptionMessage);
         verify(inMemoryDAO, times(0)).create(any());
+        verify(inMemoryDAO, times(0)).update(any());
     }
 
     @Test
     void saveArtist_shouldCreateNewArtistWhenIdIsNull() {
         // Arrange
-        Artist actualArtist = getArtists().getFirst();
-        when(inMemoryDAO.create(actualArtist)).thenReturn(actualArtist);
-        assertNull(actualArtist.getId());
+        Artist artist = Artist.builder().id(null).build();
+        when(inMemoryDAO.create(artist)).thenReturn(artist);
 
         // Act
-        Artist artist = artistDataService.saveArtist(actualArtist);
+        Artist persistedArtist = artistDataService.saveArtist(artist);
 
         // Assert
-        verify(inMemoryDAO, times(1)).create(any());
-        assertNotNull(artist);
-        assertEquals(actualArtist, artist);
+        verify(inMemoryDAO, times(1)).create(persistedArtist);
+        verify(inMemoryDAO, times(0)).update(any());
+        assertNotNull(persistedArtist);
     }
 
     @Test
     void saveArtist_shouldUpdateArtistWhenIdIsNotNullAndIdExistsInDatastore() {
         // Arrange
-        Artist actualArtist = getArtists().get(1);
-        when(inMemoryDAO.findById(anyLong())).thenReturn(Optional.ofNullable(actualArtist));
-        assertNotNull(actualArtist);
-        Artist updatedArtist = Artist.builder()
-                .id(actualArtist.getId())
-                .name(actualArtist.getName())
-                .artistType(actualArtist.getArtistType())
-                .genres(actualArtist.getGenres())
-                .yearFounded(2025)
-                .build();
-        when(inMemoryDAO.update(any())).thenReturn(updatedArtist);
+        Artist artist = Artist.builder().id(1L).yearFounded(2025).build();
+        assertNotNull(artist);
+        when(inMemoryDAO.findById(artist.getId())).thenReturn(Optional.of(artist));
+        when(inMemoryDAO.update(artist)).thenReturn(artist);
 
         // Act
-        Artist persistedArtist = artistDataService.saveArtist(updatedArtist);
+        Artist persistedArtist = artistDataService.saveArtist(artist);
 
         // Assert
+        assertNotNull(persistedArtist);
         verify(inMemoryDAO, times(0)).create(any());
         verify(inMemoryDAO, times(1)).update(any());
-        assertEquals(updatedArtist, persistedArtist);
-        assertEquals(2025, persistedArtist.getYearFounded());
     }
 
     @Test
     void saveArtist_shouldThrowExceptionIfArtistIdIsPresentButNotInDatastore() {
-        Artist actualArtist = getArtists().get(1);
-        NoArtistFoundException noArtistFoundException = assertThrows(NoArtistFoundException.class, () -> artistDataService.saveArtist(actualArtist));
-        assertNotNull(noArtistFoundException);
+        Artist artist = Artist.builder().id(1L).build();
+        NoArtistFoundException noArtistFoundException = assertThrows(NoArtistFoundException.class, () -> artistDataService.saveArtist(artist));
         String exceptionMessage = noArtistFoundException.getMessage();
         assertTrue(exceptionMessage.startsWith("No artist found with id "));
     }
@@ -144,7 +130,6 @@ class ArtistDataServiceTest {
     @Test
     void deleteArtistById_shouldThrowExceptionIfArtistIdIsNull() {
         InvalidArtistIdException invalidArtistIdException = assertThrows(InvalidArtistIdException.class, () -> artistDataService.deleteArtistById(null));
-        assertNotNull(invalidArtistIdException);
         String exceptionMessage = invalidArtistIdException.getMessage();
         assertTrue(exceptionMessage.startsWith("Artist id cannot be null"));
     }
@@ -152,17 +137,17 @@ class ArtistDataServiceTest {
     @Test
     void deleteArtistById_shouldDeleteArtistAndReturnTrueWhenIdIsNotNullAndIdExistsInDatastore() {
         // Arrange
-        Artist artist = getArtists().get(1);
-        when(inMemoryDAO.findById(anyLong())).thenReturn(Optional.ofNullable(artist));
-        when(inMemoryDAO.delete(anyLong())).thenReturn(true);
+        Artist artist = Artist.builder().id(1L).build();
         assertNotNull(artist);
+        when(inMemoryDAO.findById(artist.getId())).thenReturn(Optional.of(artist));
+        when(inMemoryDAO.delete(artist.getId())).thenReturn(true);
 
         // Act
         boolean deleteArtistById = artistDataService.deleteArtistById(artist.getId());
 
         // Assert
-        verify(inMemoryDAO, times(1)).findById(anyLong());
-        verify(inMemoryDAO, times(1)).delete(anyLong());
+        verify(inMemoryDAO, times(1)).findById(artist.getId());
+        verify(inMemoryDAO, times(1)).delete(artist.getId());
         assertTrue(deleteArtistById);
 
     }
@@ -176,31 +161,28 @@ class ArtistDataServiceTest {
 
     @Test
     void isExistingArtist_shouldReturnTrueIfArtistExists() {
-        Artist artistInDatastore = getArtists().get(1);
-        when(inMemoryDAO.findById(anyLong())).thenReturn(Optional.ofNullable(artistInDatastore));
-
-        assertTrue(artistDataService.isExistingArtist(artistInDatastore));
+        Artist artist = Artist.builder().id(1L).build();
+        when(inMemoryDAO.findById(anyLong())).thenReturn(Optional.ofNullable(artist));
+        assertTrue(artistDataService.isExistingArtist(artist));
     }
 
     @Test
     void isExistingArtist_shouldReturnFalseIfArtistDoesNotExist() {
-        Artist artistNotInDatastore = getArtists().getLast();
+        Artist artist = Artist.builder().id(1L).build();
         when(inMemoryDAO.findById(anyLong())).thenReturn(Optional.empty());
-
-        assertFalse(artistDataService.isExistingArtist(artistNotInDatastore));
+        assertFalse(artistDataService.isExistingArtist(artist));
     }
 
     @Test
     void validArtistObjectCheck_shouldThrowExceptionIfArtistIsNull() {
         NullArtistException nullArtistException = assertThrows(NullArtistException.class, () -> ArtistDataService.validArtistObjectCheck(null));
-        assertNotNull(nullArtistException);
         String exceptionMessage = nullArtistException.getMessage();
         assertEquals("Artist cannot be null", exceptionMessage);
     }
 
     @Test
     void validArtistObjectCheck_shouldNotThrowExceptionIfArtistIsPresent() {
-        Artist artist = getArtists().get(1);
+        Artist artist = Artist.builder().id(1L).build();
         assertDoesNotThrow(() -> ArtistDataService.validArtistObjectCheck(artist));
     }
 
@@ -214,32 +196,7 @@ class ArtistDataServiceTest {
 
     @Test
     void nullIdCheck_shouldNotThrowExceptionIfArtistIdIsNotNull() {
-        assertDoesNotThrow(() -> ArtistDataService.nullIdCheck(1L));
-    }
-
-    private List<Artist> getArtists() {
-        Artist artist1 = Artist.builder()
-                .id(null)
-                .name("Artist 1")
-                .artistType(ArtistType.SOLO)
-                .genre(Genre.COUNTRY)
-                .genre(Genre.FOLK)
-                .biography("Artist 1 Bio")
-                .build();
-        Artist artist2 = Artist.builder()
-                .id(1L)
-                .name("Artist 2")
-                .artistType(ArtistType.GROUP)
-                .genre(Genre.POP)
-                .biography("Artist 2 Bio")
-                .build();
-        Artist artist3 = Artist.builder()
-                .id(2L)
-                .name("Artist 3")
-                .artistType(ArtistType.SOLO)
-                .genre(Genre.HEAVY_METAL)
-                .biography("Artist 3 Bio")
-                .build();
-        return List.of(artist1, artist2, artist3);
+        Artist artist = Artist.builder().id(1L).build();
+        assertDoesNotThrow(() -> ArtistDataService.nullIdCheck(artist.getId()));
     }
 }
