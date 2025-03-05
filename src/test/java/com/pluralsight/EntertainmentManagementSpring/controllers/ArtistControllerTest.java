@@ -12,7 +12,8 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.server.ResponseStatusException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class ArtistControllerTest {
@@ -24,15 +25,15 @@ class ArtistControllerTest {
     private ArtistController artistController;
 
     @Test
-    void getArtistById_shouldReturnHttpStatusInternalServerError() {
+    void getArtistById_shouldThrowResponseStatusExceptionWithInternalServerError() {
         Mockito.when(mockArtistDataService.findArtistById(1L)).thenThrow(new RuntimeException("Thrown on purpose"));
         ResponseStatusException responseStatusException = assertThrows(ResponseStatusException.class, () -> artistController.getArtistById(1L));
         String exceptionMessage = responseStatusException.getMessage();
-        assertEquals("500 INTERNAL_SERVER_ERROR \"Unknown error occurred\"", exceptionMessage);
+        assertEquals("500 INTERNAL_SERVER_ERROR \"Thrown on purpose\"", exceptionMessage);
     }
 
     @Test
-    void getArtistById_shouldThrowNullArtistException() {
+    void getArtistById_shouldThrowInvalidArtistIdException() {
         Mockito.when(mockArtistDataService.findArtistById(1L)).thenThrow(new InvalidArtistIdException("Thrown on purpose"));
         InvalidArtistIdException invalidArtistIdException = assertThrows(InvalidArtistIdException.class, () -> artistController.getArtistById(1L));
         String exceptionMessage = invalidArtistIdException.getMessage();
@@ -44,18 +45,32 @@ class ArtistControllerTest {
         Artist artist = Artist.builder().build();
         Mockito.when(mockArtistDataService.saveArtist(artist)).thenThrow(new NullArtistException("Thrown on purpose"));
         NullArtistException nullArtistException = assertThrows(NullArtistException.class, () -> artistController.createArtist(artist));
-        assertNotNull(nullArtistException);
         String exceptionMessage = nullArtistException.getMessage();
         assertEquals("Thrown on purpose", exceptionMessage);
     }
 
     @Test
-    void create_shouldReturnHttpStatusInternalServerError() {
+    void create_shouldThrowResponseStatusExceptionWithInternalServerError() {
         Artist artist = Artist.builder().build();
         Mockito.when(mockArtistDataService.saveArtist(artist)).thenThrow(new RuntimeException("Thrown on purpose"));
         ResponseStatusException responseStatusException = assertThrows(ResponseStatusException.class, () -> artistController.createArtist(artist));
-        assertNotNull(responseStatusException);
         String exceptionMessage = responseStatusException.getMessage();
-        assertEquals("500 INTERNAL_SERVER_ERROR \"Unknown error occurred\"", exceptionMessage);
+        assertEquals("500 INTERNAL_SERVER_ERROR \"Thrown on purpose\"", exceptionMessage);
+    }
+
+    @Test
+    void getAllArtists_shouldThrowResponseStatusExceptionWithInternalServerError() {
+        Mockito.when(mockArtistDataService.findAllArtists()).thenThrow(new RuntimeException("Thrown on purpose"));
+        ResponseStatusException responseStatusException = assertThrows(ResponseStatusException.class, () -> artistController.getAllArtists());
+        String exceptionMessage = responseStatusException.getMessage();
+        assertEquals("500 INTERNAL_SERVER_ERROR \"Thrown on purpose\"", exceptionMessage);
+    }
+
+    @Test
+    void getArtistByName_shouldThrowResponseStatusExceptionWithInternalServerError() {
+        Mockito.when(mockArtistDataService.findAllArtistsByName(Mockito.anyString())).thenThrow(new RuntimeException("Thrown on purpose"));
+        ResponseStatusException responseStatusException = assertThrows(ResponseStatusException.class, () -> artistController.getArtistByName("Test"));
+        String exceptionMessage = responseStatusException.getMessage();
+        assertEquals("500 INTERNAL_SERVER_ERROR \"Thrown on purpose\"", exceptionMessage);
     }
 }

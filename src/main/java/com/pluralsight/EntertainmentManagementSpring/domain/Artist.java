@@ -24,7 +24,7 @@ public class Artist extends BaseEntity {
     private ArtistType artistType;
 
     @Singular
-    private List<Genre> genres;
+    private List<Genre> genres = new ArrayList<>();
 
     private String biography;
 
@@ -37,21 +37,15 @@ public class Artist extends BaseEntity {
     @JsonIgnore
     @ToString.Exclude
     @Singular
-    private List<Track> tracks;
+    private List<Track> tracks = new ArrayList<>();
 
     public void addGenre(@NonNull Genre genre) {
-        if (genres == null) {
-            genres = new ArrayList<>();
-        }
         if (!genres.contains(genre)) {
             genres.add(genre);
         }
     }
 
     public void addTrack(@NonNull Track track) {
-        if (tracks == null) {
-            tracks = new ArrayList<>();
-        }
         Optional<Track> optionalTrack = tracks.stream()
                 .filter(t -> t.getTitle().equalsIgnoreCase(track.getTitle()))
                 .findFirst();

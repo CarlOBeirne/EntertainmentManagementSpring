@@ -7,6 +7,7 @@ import com.pluralsight.EntertainmentManagementSpring.models.ArtistDto;
 import com.pluralsight.EntertainmentManagementSpring.service.ArtistDataService;
 import com.pluralsight.EntertainmentManagementSpring.utils.exceptions.InvalidArtistIdException;
 import com.pluralsight.EntertainmentManagementSpring.utils.exceptions.NullArtistException;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -39,12 +40,12 @@ public class ArtistController {
         } catch (NullArtistException e) {
             throw e;
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unknown error occurred");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 
     @GetMapping
-    public ResponseEntity<ArtistDto> getArtistById(@RequestParam Long artistId)  {
+    public ResponseEntity<ArtistDto> getArtistById(@NonNull @RequestParam Long artistId)  {
         try {
             Optional<Artist> optionalArtist = artistDataService.findArtistById(artistId);
             return optionalArtist
@@ -57,7 +58,7 @@ public class ArtistController {
             throw e;
         }
         catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unknown error occurred");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 
@@ -72,7 +73,40 @@ public class ArtistController {
             allArtists.forEach(artist -> artistDtoList.add(buildArtistToDto(artist)));
             return ResponseEntity.ok(artistDtoList);
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unknown error occurred");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/name/{name}")
+    public ResponseEntity<List<ArtistDto>> getArtistByName(@PathVariable String name) {
+        if (name.isBlank()) {
+            return ResponseEntity.notFound().build();
+        }
+        try {
+            List<Artist> allArtistsByName = artistDataService.findAllArtistsByName(name);
+            if (allArtistsByName.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+            ArrayList<ArtistDto> artistDtoList = new ArrayList<>();
+            allArtistsByName.forEach(artist -> artistDtoList.add(buildArtistToDto(artist)));
+            return ResponseEntity.ok(artistDtoList);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
+    }
+
+    @DeleteMapping(path = "/delete/{id}")
+    public ResponseEntity<Boolean> deleteArtistById(@NonNull @PathVariable Long id)  {
+        try {
+            Optional<Artist> optionalArtist = artistDataService.findArtistById(id);
+            if (optionalArtist.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok(artistDataService.deleteArtistById(id));
+        } catch (InvalidArtistIdException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 
