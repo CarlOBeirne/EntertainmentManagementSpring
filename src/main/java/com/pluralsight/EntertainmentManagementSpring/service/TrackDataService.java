@@ -1,6 +1,7 @@
 package com.pluralsight.EntertainmentManagementSpring.service;
 
 import com.pluralsight.EntertainmentManagementSpring.dao.inmemory.InMemoryTrackDAO;
+import com.pluralsight.EntertainmentManagementSpring.domain.Artist;
 import com.pluralsight.EntertainmentManagementSpring.domain.Track;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,9 +14,25 @@ import java.util.Optional;
 @RequiredArgsConstructor
 
 public class TrackDataService {
-    private final InMemoryTrackDAO<Track> trackDAO;
 
-    public Track createTrack(Track track) { return trackDAO.create(track); }
+    private final InMemoryTrackDAO<Track> trackDAO;
+    private final ArtistDataService artistDataService;
+
+    public Track createTrack(Track track) {
+        Track persistedTrack = trackDAO.create(track);
+        persistedTrack.getArtists().forEach(artist -> {
+            artistDataService.findArtistById(artist.getId()).ifPresent(artistData -> {
+                Artist artistBuilder = Artist.builder()
+                        .id(artistData.getId())
+                        .name(artistData.getName())
+                        .track(persistedTrack)
+                        .genre(persistedTrack.getGenre())
+                        .build();
+                artistDataService.saveArtist(artistBuilder);
+            });
+        });
+        return persistedTrack;
+    }
     public Track getByTrackId(Long id) { return trackDAO.findById(id).orElse(null); }
     public List<Track> getAllTracks() {
         return trackDAO.findAll();
@@ -33,7 +50,7 @@ public class TrackDataService {
                     t.setTitle(track.getTitle());
                     t.setDurationSeconds(track.getDurationSeconds());
                     t.setGenre(track.getGenre());
-                    t.setTracks(track.getTracks());
+                    t.setArtists(track.getArtists());
                     t.setYearReleased(track.getYearReleased());
                     t.setBeatsPerMinute(track.getBeatsPerMinute());
                     return trackDAO.update(t);
