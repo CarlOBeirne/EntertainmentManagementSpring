@@ -6,7 +6,9 @@ import com.pluralsight.EntertainmentManagementSpring.enums.Genre;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Data
 @AllArgsConstructor
@@ -36,6 +38,27 @@ public class Artist extends BaseEntity {
     @ToString.Exclude
     @Singular
     private List<Track> tracks;
+
+    public void addGenre(@NonNull Genre genre) {
+        if (genres == null) {
+            genres = new ArrayList<>();
+        }
+        if (!genres.contains(genre)) {
+            genres.add(genre);
+        }
+    }
+
+    public void addTrack(@NonNull Track track) {
+        if (tracks == null) {
+            tracks = new ArrayList<>();
+        }
+        Optional<Track> optionalTrack = tracks.stream()
+                .filter(t -> t.getTitle().equalsIgnoreCase(track.getTitle()))
+                .findFirst();
+        if (optionalTrack.isEmpty()) {
+            tracks.add(track);
+        }
+    }
 
 
 }

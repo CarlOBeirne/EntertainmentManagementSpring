@@ -20,16 +20,13 @@ public class TrackDataService {
 
     public Track createTrack(Track track) {
         Track persistedTrack = trackDAO.create(track);
-        persistedTrack.getArtists().forEach(artist -> {
-            artistDataService.findArtistById(artist.getId()).ifPresent(artistData -> {
-                Artist artistBuilder = Artist.builder()
-                        .id(artistData.getId())
-                        .name(artistData.getName())
-                        .track(persistedTrack)
-                        .genre(persistedTrack.getGenre())
-                        .build();
-                artistDataService.saveArtist(artistBuilder);
-            });
+        List<Artist> artists = persistedTrack.getArtists();
+        artists.forEach(artist -> {
+            artistDataService.findArtistById(artist.getId())
+                    .ifPresent(artistData -> {
+                        artistData.addGenre(persistedTrack.getGenre());
+                        artistData.addTrack(persistedTrack);
+                    });
         });
         return persistedTrack;
     }
