@@ -21,6 +21,7 @@ class ArtistControllerTest {
     @Mock
     private ArtistDataService mockArtistDataService;
 
+
     @InjectMocks
     private ArtistController artistController;
 
@@ -72,5 +73,32 @@ class ArtistControllerTest {
         ResponseStatusException responseStatusException = assertThrows(ResponseStatusException.class, () -> artistController.getArtistByName("Test"));
         String exceptionMessage = responseStatusException.getMessage();
         assertEquals("500 INTERNAL_SERVER_ERROR \"Thrown on purpose\"", exceptionMessage);
+    }
+
+
+    @Test
+    void updateArtist_shouldThrowResponseStatusExceptionWithInternalServerError() {
+        Artist artist = Artist.builder().id(1L).build();
+        Mockito.when(mockArtistDataService.findArtistById(artist.getId())).thenThrow(new RuntimeException("Thrown on purpose"));
+        ResponseStatusException responseStatusException = assertThrows(ResponseStatusException.class, () -> artistController.updateArtist(artist));
+        String exceptionMessage = responseStatusException.getMessage();
+        assertEquals("500 INTERNAL_SERVER_ERROR \"Thrown on purpose\"", exceptionMessage);
+    }
+
+    @Test
+    void deleteArtist_shouldThrowResponseStatusExceptionWhenArtistIdDoesNotExist() {
+        Artist artist = Artist.builder().id(1L).build();
+        Mockito.when(mockArtistDataService.findArtistById(artist.getId())).thenThrow(new RuntimeException("Thrown on purpose"));
+        ResponseStatusException responseStatusException = assertThrows(ResponseStatusException.class, () -> artistController.deleteArtistById(artist.getId()));
+        String exceptionMessage = responseStatusException.getMessage();
+        assertEquals("500 INTERNAL_SERVER_ERROR \"Thrown on purpose\"", exceptionMessage);
+    }
+
+    @Test
+    void deleteArtist_shouldThrowResponseStatusExceptionWhenArtistIdIsNull() {
+        Artist artist = Artist.builder().id(null).build();
+        NullPointerException nullPointerException = assertThrows(NullPointerException.class, () -> artistController.deleteArtistById(artist.getId()));
+        String exceptionMessage = nullPointerException.getMessage();
+        assertEquals("id is marked non-null but is null", exceptionMessage);
     }
 }
