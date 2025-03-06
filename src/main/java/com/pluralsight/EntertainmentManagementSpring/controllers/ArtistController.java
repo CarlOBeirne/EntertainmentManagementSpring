@@ -110,17 +110,34 @@ public class ArtistController {
         }
     }
 
+    @PutMapping(path = "/update")
+    public ResponseEntity<ArtistDto> updateArtist(@NonNull @RequestBody Artist artist)  {
+        try {
+            Optional<Artist> optionalArtist = artistDataService.findArtistById(artist.getId());
+            if (optionalArtist.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+            Artist updatedArtist = artistDataService.saveArtist(artist);
+            return ResponseEntity.ok(buildArtistToDto(updatedArtist));
+        } catch (InvalidArtistIdException e) {
+            log.warn("Warning trying to update artist. {}",e.getMessage());
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
+    }
+
     private static ArtistDto buildArtistToDto(Artist artist) {
         return ArtistDto.builder()
                 .id(artist.getId())
                 .name(artist.getName())
-                .genres(artist.getGenres() == null ? null : artist.getGenres().stream()
+                .genres(artist.getGenres().equals(List.of()) ? List.of() : artist.getGenres().stream()
                         .map(Genre::name)
                         .toList())
                 .biography(artist.getBiography())
                 .nationality(artist.getNationality())
                 .yearFounded(artist.getYearFounded())
-                .tracks(artist.getTracks() == null ? null : artist.getTracks().stream()
+                .tracks(artist.getTracks().equals(List.of()) ? List.of() : artist.getTracks().stream()
                         .map(Track::getTitle)
                         .toList()).build();
     }

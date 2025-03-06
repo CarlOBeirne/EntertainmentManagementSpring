@@ -23,6 +23,7 @@ public class Artist extends BaseEntity {
     @EqualsAndHashCode.Include
     private ArtistType artistType;
 
+    @JsonIgnore
     @Singular
     private List<Genre> genres = new ArrayList<>();
 
