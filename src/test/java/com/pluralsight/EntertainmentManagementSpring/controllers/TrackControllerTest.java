@@ -120,8 +120,6 @@ class TrackControllerTest {
         Track updatedTrack = testTrack.toBuilder()
                 .title("UpdatedSongTitle")
                 .build();
-        //testTrack = trackDataService.createTrack(testTrack);
-        //testTrack.setTitle("UpdatedSongName");
 
         Mockito.when(trackDataService.createTrack(Mockito.any(Track.class))).thenReturn(testTrack);
         Mockito.when(trackDataService.updateTrack(Mockito.any(Track.class))).thenReturn(updatedTrack);
@@ -147,58 +145,10 @@ class TrackControllerTest {
                 .beatsPerMinute(120)
                 .build();
 
-        //testTrack = trackDataService.createTrack(testTrack);
-
         Mockito.when(trackDataService.createTrack(Mockito.any(Track.class))).thenReturn(testTrack);
         Mockito.when(trackDataService.deleteTrack(1L)).thenReturn(true);
 
-        //when (trackDataService.deleteTrack(1L)).thenReturn(true);
         mockMvc.perform(delete("/tracks/" + testTrack.getId()))
                 .andExpect(status().isAccepted());
-        //TODO ask question
-        //mockMvc.perform(MockMvcRequestBuilders.delete("/tracks/" + testTrack.getId()))
-        //        .andExpect(status().isOk());
     }
-
-    //@Test
-    //public void testGetTrackById() throws Exception {
-    //    Track testTrack = Track.TrackBuilder()
-    //            .title("Wasted Youth")
-    //            .durationSeconds(120)
-    //            .genre(Genre.ELECTRONIC)
-    //            .yearReleased(2020)
-    //            .beatsPerMinute(140)
-    //            .build();
-    //}
-
-//    @Test
-//    void testGetAllTracks_ReturnsTracks() throws Exception {
-//        List<Track> tracks = Arrays.asList(track1, track2);
-//        when(trackDataService.getAllTracks()).thenReturn(tracks);
-//
-//        mockMvc.perform(get("/tracks"))
-//                .andExpect(status().isOk()) // 200
-//                .andExpect(jsonPath("$.size()").value(2)) // Check array size
-//                .andExpect(jsonPath("$[0].title").value("Bohemian Rhapsody"))
-//                .andExpect(jsonPath("$[1].title").value("Stairway to Heaven"));
-//
-//        verify(trackDataService, times(1)).getAllTracks();
-//    }
-
-//public class Track extends BaseEntity {
-//
-//    @EqualsAndHashCode.Include
-//    private String title;
-//    @EqualsAndHashCode.Include
-//    private int durationSeconds;
-//    @EqualsAndHashCode.Include
-//    private Genre genre;
-//    @Singular
-//    private List<Artist> artists;
-//    @EqualsAndHashCode.Include
-//    private int yearReleased;
-//    @EqualsAndHashCode.Include
-//    private int beatsPerMinute;
-//}
-
 }

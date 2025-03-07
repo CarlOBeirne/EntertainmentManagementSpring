@@ -8,6 +8,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -22,10 +25,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+@SpringBootTest
+@AutoConfigureMockMvc
 @ExtendWith(MockitoExtension.class)
 public class PlaylistControllerTest {
-
-    private MockMvc mockMvc;
 
     @Mock
     private PlaylistService playlistService;
@@ -33,10 +36,14 @@ public class PlaylistControllerTest {
     @InjectMocks
     private PlaylistController playlistController;
 
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
     private final ObjectMapper objectMapper = new ObjectMapper();
+
     private Playlist playlist;
     private Track track;
-
 
     @BeforeEach
     void setUp() {
@@ -44,6 +51,9 @@ public class PlaylistControllerTest {
         playlist.setId(1L);
         track = new Track("Test Track", 200, null, List.of(), 2023, 120);
         track.setId(10L);
+        when(playlistService.getPlaylistById(1L)).thenReturn(Optional.of(playlist));
+        when(playlistService.getAllPlaylists()).thenReturn(List.of(playlist));
+
     }
 
     @Test
