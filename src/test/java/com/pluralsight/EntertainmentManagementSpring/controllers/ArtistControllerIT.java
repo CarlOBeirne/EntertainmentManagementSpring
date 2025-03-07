@@ -106,4 +106,59 @@ class ArtistControllerIT {
         mockMvc.perform(MockMvcRequestBuilders.get(("/api/artist/name/  ")))
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    void updateArtist_shouldReturnHttpStatusOk() throws Exception {
+        // Given
+        Artist artist = Artist.builder().build();
+        Artist persistedArtist = artistDataService.saveArtist(artist);
+
+        // When
+        persistedArtist.setName("Test2");
+
+        // Then
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/artist/update")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(persistedArtist)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void updateArtist_shouldReturnHttpStatusNotFoundWhenNoIdInDatabase() throws Exception {
+        Artist artist = Artist.builder().id(1L).build();
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/artist/update")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(artist)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void updateArtist_shouldReturnHttpStatusNotFoundWhenNullIdPassed() throws Exception {
+        Artist artist = Artist.builder().id(null).build();
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/artist/update")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(artist)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deleteArtist_shouldReturnHttpStatusOk() throws Exception {
+        Artist artist = Artist.builder().build();
+        Artist persistedArtist = artistDataService.saveArtist(artist);
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/artist/delete/{artistId}", persistedArtist.getId())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(persistedArtist)))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    void deleteArtist_shouldReturnHttpStatusNotFoundWhenIdPassedNotInDatabase() throws Exception {
+        Artist artist = Artist.builder().id(1L).build();
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/artist/delete/{artistId}", artist.getId())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(artist)))
+            .andExpect(status().isNotFound());
+    }
+
+
 }
