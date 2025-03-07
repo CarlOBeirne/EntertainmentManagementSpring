@@ -59,7 +59,6 @@ public class PlaylistServiceImplTest {
 
     @Test
     void testEditPlaylist() {
-        when(playlistDao.findPlaylistById(1L)).thenReturn(Optional.of(playlist));
         Playlist updatedPlaylist = new Playlist(List.of(), "Updated Title", "Updated Description");
         playlistService.editPlaylist(1L, updatedPlaylist);
         verify(playlistDao, times(1)).editPlaylist(1L, updatedPlaylist);

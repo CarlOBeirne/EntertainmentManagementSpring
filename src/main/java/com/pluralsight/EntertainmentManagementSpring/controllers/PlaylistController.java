@@ -5,6 +5,7 @@ import com.pluralsight.EntertainmentManagementSpring.domain.Track;
 import com.pluralsight.EntertainmentManagementSpring.service.PlaylistService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -48,8 +49,10 @@ public class PlaylistController {
 
     @GetMapping("{playlistId}")
     @ResponseStatus(HttpStatus.OK)
-    public Optional<Playlist> getPlaylistById(@PathVariable Long playlistId) {
-        return playlistService.getPlaylistById(playlistId);
+    public ResponseEntity<Playlist> getPlaylistById(@PathVariable Long playlistId) {
+        return playlistService.getPlaylistById(playlistId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping("/new")

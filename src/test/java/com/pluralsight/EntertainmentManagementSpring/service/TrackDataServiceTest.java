@@ -3,7 +3,6 @@ package com.pluralsight.EntertainmentManagementSpring.service;
 import com.pluralsight.EntertainmentManagementSpring.dao.inmemory.InMemoryTrackDAO;
 import com.pluralsight.EntertainmentManagementSpring.domain.Artist;
 import com.pluralsight.EntertainmentManagementSpring.domain.Track;
-import com.pluralsight.EntertainmentManagementSpring.enums.ArtistType;
 import com.pluralsight.EntertainmentManagementSpring.enums.Genre;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -18,7 +17,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
@@ -81,20 +79,6 @@ public class TrackDataServiceTest {
         Mockito.verify(inMemoryTrackDAO, Mockito.times(1)).findAll();
 
     }
-
-    //@Test
-    //public void TestFindTrackById() {
-    //    //Arrange
-    //    Mockito.when(inMemoryTrackDAO.findById(1L)).thenReturn(Optional.of(testTrack));
-    //    //Act
-    //    Track testTrack = trackDataService.getByTrackId(1L);
-    //    //Assert
-    //    assertAll(
-    //            () -> assertNotNull(testTrack),
-    //            () -> assertEquals(1L, testTrack.getId())
-    //    );
-    //    Mockito.verify(inMemoryTrackDAO, Mockito.times(1)).findById(1L);
-    //}
 
     @Test
     public void TestFindTrackById_NotFound() {
@@ -196,97 +180,13 @@ public class TrackDataServiceTest {
             return track;
         });
 
-        //Mockito.when(inMemoryTrackDAO.create(testTrack)).thenReturn(testTrack);
-        //Mockito.when(inMemoryTrackDAO.findById(1L)).thenReturn(Optional.ofNullable(testTrack));
-
         //Act
         Track createdTrack = trackDataService.createTrack(testTrack);
-
-        //Track resultTrack = trackDataService.getByTrackId(createdTrack.getId());
 
         //assert
         assertEquals(createdTrack, testTrack);
         assertNotNull(createdTrack);
         Mockito.verify(inMemoryTrackDAO, Mockito.times(1)).create(testTrack);
-        //Mockito.verify(inMemoryTrackDAO, Mockito.times(1)).findById(1L);
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
 }
-
-//return Optional.ofNullable(datastore.get(id))
-
-
-    //@BeforeEach
-    //void setUp() {
-    //    testArtist = new Artist();
-    //    testTrack = createTestTrack(1L, "Bohemian Rhapsody", Genre.ROCK, 354, List.of(testArtist));
-//
-    //}
-
-   //private Track createTestTrack( String title, String genre, int duration) {
-   //    Track track = new Track();
-   //    track.setTitle(title);
-   //    track.setGenre(Genre.valueOf(genre));
-   //    track.setDurationSeconds(duration);
-   //    return track;
-    //}
-//
-    //private Track createTestTrack(Long id, String title, Genre genre, int duration, List<Artist> artists) {
-    //    Track track = new testTrack(id, title, genre, duration);
-    //    track.setArtists(artists);
-    //    return track;
-    //}
-    //    @EqualsAndHashCode.Include
-    //    private String name;
-    //
-    //    @EqualsAndHashCode.Include
-    //    private ArtistType artistType;
-    //
-    //    @Singular
-    //    private List<Genre> genres;
-    //
-    //    private String biography;
-    //
-    //    @EqualsAndHashCode.Include
-    //    private String nationality;
-    //
-    //    @EqualsAndHashCode.Include
-    //    private int yearFounded;
-    //
-    //    @JsonIgnore
-    //    @ToString.Exclude
-    //    @Singular
-    //    private List<Track> tracks;
-
-
-
-    //@BeforeEach
-    //public void setUp() {
-    //    track1 = Track.builder()
-    //            .id(1l)
-    //            .title("Roxanne")
-    //            .genre(Genre.valueOf(String.valueOf(Genre.ROCK)))
-    //            .durationSeconds((120)
-    //                    .build();
-//
-//
-//
-    //}
-
-
-//"Roxanne", String.valueOf(Genre.ROCK), 120);
-
-
-//}
