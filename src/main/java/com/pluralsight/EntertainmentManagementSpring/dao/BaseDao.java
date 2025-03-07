@@ -8,7 +8,6 @@ public interface BaseDao<T> {
     
     Optional <T> findById(Long id);
     List<T> findAll();
-    List<T> findByName(String name);
     T create(T t);
     T update(T t);
     boolean delete(Long id);

@@ -20,11 +20,6 @@ public abstract class InMemoryDAO<T extends BaseEntity> implements BaseDao<T> {
         return Optional.ofNullable(datastore.get(id));
     }
 
-   /* @Override
-    public List<T> findByName(String name) {
-        return T.ofNullable(datastore.get(name));
-    }*/
-
     @Override
     public List<T> findAll() {
         return new ArrayList<>(datastore.values());

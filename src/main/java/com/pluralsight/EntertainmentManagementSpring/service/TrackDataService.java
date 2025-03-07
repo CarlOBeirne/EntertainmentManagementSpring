@@ -1,7 +1,6 @@
 package com.pluralsight.EntertainmentManagementSpring.service;
 
 import com.pluralsight.EntertainmentManagementSpring.dao.inmemory.InMemoryDAO;
-import com.pluralsight.EntertainmentManagementSpring.dao.inmemory.InMemoryTrackDAO;
 import com.pluralsight.EntertainmentManagementSpring.domain.Artist;
 import com.pluralsight.EntertainmentManagementSpring.domain.Track;
 import com.pluralsight.EntertainmentManagementSpring.utils.events.ArtistDeletionEvent;
@@ -22,7 +21,7 @@ import java.util.Optional;
 @Log4j2
 public class TrackDataService {
 
-    private final InMemoryTrackDAO<Track> trackDAO;
+    private final InMemoryDAO<Track> trackDAO;
     private final InMemoryDAO<Artist> artistDAO;
 
     private final ApplicationEventPublisher trackPublisher;
@@ -37,9 +36,6 @@ public class TrackDataService {
     public List<Track> getAllTracks() {
         return trackDAO.findAll();
     }
-    //public List<Track> getAllTracks() {
-    //    return Optional.ofNullable(trackDAO.findAll()).orElse(Collections.emptyList());
-    //}
 
     public Track updateTrack(Track track) {
         Optional<Track> existingTrack = trackDAO.findById(track.getId());
@@ -81,11 +77,3 @@ public class TrackDataService {
     }
 
 }
-
-//private Long id;
-//private String title;
-//private int durationSeconds;
-//private Genre genre;
-//private List<Track> tracks;
-//private int yearReleased;
-//private int beatsPerMinute;

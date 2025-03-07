@@ -35,7 +35,7 @@ public class PlaylistController {
         return playlistService.getPlaylistByName(playlistName);
     }
 
-    @GetMapping("/{playlistId}/tracks")
+    @GetMapping("/{playlistId}/tracks-by-name")
     @ResponseStatus(HttpStatus.OK)
     public Optional<List<Track>> getPlaylistTracksByName(@PathVariable Long playlistId, @RequestParam String trackName) {
         return playlistService.getPlaylistTracksByName(playlistId, trackName);
