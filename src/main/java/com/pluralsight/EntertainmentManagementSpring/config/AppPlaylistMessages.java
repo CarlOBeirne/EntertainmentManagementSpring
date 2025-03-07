@@ -14,6 +14,4 @@ public class AppPlaylistMessages {
     public static final String PLAYLIST_NOT_UPDATED_ERROR = "The playlist has been not updated, please set a new value for at least one field";
     public static final String TRACK_DUPLICATED_ERROR = "The track already exists in this playlist, please try to add another track";
     public static final String PLAYLIST_NOT_NULL_ERROR = "Playlist can't be null";
-
-
 }

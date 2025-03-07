@@ -3,8 +3,6 @@ package com.pluralsight.EntertainmentManagementSpring.domain;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
